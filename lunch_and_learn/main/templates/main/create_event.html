@@ -1,0 +1,14 @@
+{% extends 'main/header.html' %}
+
+{% block content %}
+    
+<div id="checkboxes">
+        <label>Select people to invite</label>
+            
+                    {% for user in data %}
+                    <br>
+                    <label><input type="checkbox">{{user}}</label>
+                    {% endfor %}
+               
+       
+{% endblock %}
