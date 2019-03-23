@@ -3,21 +3,21 @@
 {% block content %}
     
 <div id="checkboxes">
-        <label>Select people to invite</label>
+        <label>Select a skill to talk about</label>
             
-                    {% for user in data %}
+                    {% for skill in data %}
                     <br>
                         <label>
                             <input type="checkbox" value="True">
                             <span>
-                                {{user}}
+                                {{skill}}
                             </span>
                         </label>
                     {% endfor %}
                     
                
 </div>      
-<form action='choose_skill' method='GET'>
+<form action='choose_lead' method='GET'>
         <button type='submit'>Next</button>
 </form>
 {% endblock %}

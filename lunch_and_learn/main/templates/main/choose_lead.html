@@ -3,7 +3,7 @@
 {% block content %}
     
 <div id="checkboxes">
-        <label>Select people to invite</label>
+        <label>Select someone to lead the Lunch and Learn</label>
             
                     {% for user in data %}
                     <br>
@@ -17,7 +17,7 @@
                     
                
 </div>      
-<form action='choose_skill' method='GET'>
+<form action='choose_food' method='GET'>
         <button type='submit'>Next</button>
 </form>
 {% endblock %}

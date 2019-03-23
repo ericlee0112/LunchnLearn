@@ -16,7 +16,7 @@ class NewUserForm(UserCreationForm):
         if commit:
             user.save()
         return user
-        
+        '''
 class CheckboxSelectMultiple(ChoiceWidget):
     allow_multiple_selected = True
     input_type = 'checkbox'
@@ -40,4 +40,4 @@ class CheckboxSelectMultiple(ChoiceWidget):
         """
         if index is None:
             return ''
-        return super().id_for_label(id_, index)
+        return super().id_for_label(id_, index)'''

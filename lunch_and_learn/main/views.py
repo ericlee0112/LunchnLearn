@@ -81,3 +81,21 @@ def create_event(request):
 def edit_profile(request):
     return render(request=request,
                   template_name="main/edit_profile.html")
+
+def choose_skill(request):
+    skills = ['Java', 'C++', 'Kubernetes', 'Kotlin', 'Git', 'Bash']
+    return render(request=request,
+                  template_name="main/choose_skill.html",
+                  context={"data":skills})
+
+def choose_lead(request):
+    available_people = ['Anant', 'Brian', 'Osama']
+    return render(request=request,
+                  template_name="main/choose_lead.html",
+                  context={"data":available_people})
+
+def choose_food(request):
+    food = ['sandwiches', 'pasta', 'soup']
+    return render(request=request,
+                  template_name="main/choose_food.html",
+                  context={"data":food}) 
