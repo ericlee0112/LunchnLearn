@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from main.models import User
+from main.models import *
 from main.serializer import UserSerializer
 from rest_framework import generics
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
@@ -73,7 +73,8 @@ def logout_request(request):
 
 def create_event(request):
     #get some data
-    people = ['Eric', 'Brian', 'Ashkan', 'Osama', 'Anant']
+    
+    people = [f"{user.first_name} {user.last_name}" for user in User.objects.all()]
     return render(request=request,
                   template_name="main/create_event.html",
                   context={"data":people})
@@ -83,10 +84,13 @@ def edit_profile(request):
                   template_name="main/edit_profile.html")
 
 def choose_skill(request):
-    skills = ['Java', 'C++', 'Kubernetes', 'Kotlin', 'Git', 'Bash']
-    return render(request=request,
-                  template_name="main/choose_skill.html",
-                  context={"data":skills})
+    
+    if request.method == 'POST':
+        print(request.POST)
+        skills = [skill.skill_name for skill in Skill.objects.all()]
+        return render(request=request,
+                    template_name="main/choose_skill.html",
+                    context={"data":skills})
 
 def choose_lead(request):
     available_people = ['Anant', 'Brian', 'Osama']
