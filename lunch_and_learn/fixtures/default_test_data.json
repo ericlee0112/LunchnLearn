@@ -132,7 +132,7 @@
     },
     {
         "model": "main.user",
-        "pk": "productionsrto@gmail.com",
+        "pk": "productions.rto@gmail.com",
         "fields": {
             "first_name": "Osama",
             "last_name": "Murshid",
@@ -238,7 +238,7 @@
         "model": "main.user_skill",
         "pk": 6,
         "fields": {
-            "username": "productionsrto@gmail.com",
+            "username": "productions.rto@gmail.com",
             "skill_name": "Bash",
             "skill_level": 6,
             "wants": false
@@ -248,7 +248,7 @@
         "model": "main.user_skill",
         "pk": 7,
         "fields": {
-            "username": "productionsrto@gmail.com",
+            "username": "productions.rto@gmail.com",
             "skill_name": "Kotlin",
             "skill_level": 2,
             "wants": true
@@ -258,7 +258,7 @@
         "model": "main.user_skill",
         "pk": 8,
         "fields": {
-            "username": "productionsrto@gmail.com",
+            "username": "productions.rto@gmail.com",
             "skill_name": "Kubernetes",
             "skill_level": 9001,
             "wants": false
@@ -268,7 +268,7 @@
         "model": "main.user_skill",
         "pk": 9,
         "fields": {
-            "username": "productionsrto@gmail.com",
+            "username": "productions.rto@gmail.com",
             "skill_name": "C++",
             "skill_level": 0,
             "wants": true
