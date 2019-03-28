@@ -1,0 +1,25 @@
+{% extends 'main/header.html' %}
+
+{% block content %}
+
+<div id="checkboxes">
+    <form action='choose_skill' method='POST'>
+        {% csrf_token %}
+
+        <label>Select people to invite</label>
+
+        {% for user, name in data.items %}
+        <br>
+        <label>
+            <input type="checkbox" name="names" value="{{user}}">
+            <span>
+                {{name}}
+            </span>
+        </label>
+        {% endfor %}
+        <br>
+        <button type='submit'>Next</button>
+    </form>
+
+</div>
+{% endblock %}

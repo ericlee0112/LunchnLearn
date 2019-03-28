@@ -1,0 +1,34 @@
+{% extends 'main/header.html' %}
+
+{% block content %}
+<!--
+<form method="POST" action="">
+        {% csrf_token %}
+        {{ form }}
+        <input type="submit" value="Save">
+</form>
+-->
+<label>Edit Profile</label>
+<form action="/team_name_url/" method="post">
+    <label for="team_name">Name:</label>
+    <input id="team_name" type="text" name="position" value="">
+    <label for="team_name">Department:</label>
+    <input id="team_name" type="text" name="position" value="">
+    <label for="team_name">Position:</label>
+    <input id="team_name" type="text" name="position" value="">
+    <label for="team_name">What skills do you know:</label>
+    <input id="team_name" type="text" name="position" value="">
+    <input id="team_name" type="text" name="position" value="">
+    <input id="team_name" type="text" name="position" value="">
+    <input id="team_name" type="text" name="position" value="">
+    <input id="team_name" type="text" name="position" value="">
+    <label for="awef">What skills do you want to learn:</label>
+    <input id="team_name" type="text" name="position" value="">
+    <input id="team_name" type="text" name="position" value="">
+    <input id="team_name" type="text" name="position" value="">
+    <input id="team_name" type="text" name="position" value="">
+    <input id="team_name" type="text" name="position" value="">
+    <input type="submit" value="OK">
+</form>           
+       
+{% endblock %}

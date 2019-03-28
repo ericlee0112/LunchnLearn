@@ -1,0 +1,25 @@
+{% extends 'main/header.html' %}
+
+{% block content %}
+
+<div id="checkboxes">
+    <form action='choose_time' method='POST'>
+        {% csrf_token %}
+        <label>Select someone to lead the Lunch and Learn</label>
+
+        {% for teacher,info in data.items %}
+        <br>
+        <label>
+            <input type="radio" name="teacher" value="{{teacher}}">
+            <span>
+                <!-- info = [user full name, skill level] -->
+                {{info.0}}: {{info.1}}
+            </span>
+        </label>
+        {% endfor %}
+        <br>
+
+        <button type='submit'>Next</button>
+    </form>
+</div>
+{% endblock %}

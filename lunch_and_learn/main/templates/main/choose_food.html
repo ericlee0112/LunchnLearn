@@ -1,0 +1,23 @@
+{% extends 'main/header.html' %}
+
+{% block content %}
+    
+<div id="checkboxes">
+        <label>Select 3 food options</label>
+            
+                    {% for food in data %}
+                    <br>
+                        <label>
+                            <input type="checkbox" value="True">
+                            <span>
+                                {{food}}
+                            </span>
+                        </label>
+                    {% endfor %}
+                    
+               
+</div>      
+<form action='confirm details' method='GET'>
+        <button type='submit'>Next</button>
+</form>
+{% endblock %}
