@@ -1,23 +1,25 @@
 {% extends 'main/header.html' %}
 
 {% block content %}
-    
+
 <div id="checkboxes">
+    <form action='choose_skill' method='POST'>
+        {% csrf_token %}
+
         <label>Select people to invite</label>
-            
-                    {% for user in data %}
-                    <br>
-                        <label>
-                            <input type="checkbox" value="True">
-                            <span>
-                                {{user}}
-                            </span>
-                        </label>
-                    {% endfor %}
-                    
-               
-</div>      
-<form action='choose_skill' method='GET'>
+
+        {% for user, name in data.items %}
+        <br>
+        <label>
+            <input type="checkbox" name="names" value="{{user}}">
+            <span>
+                {{name}}
+            </span>
+        </label>
+        {% endfor %}
+        <br>
         <button type='submit'>Next</button>
-</form>
+    </form>
+
+</div>
 {% endblock %}

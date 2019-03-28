@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from main.models import User
+from main.models import *
 from main.serializer import UserSerializer
 from rest_framework import generics
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
@@ -19,9 +19,9 @@ class UserList(generics.ListAPIView):
     serializer_class = UserSerializer
 
 def homepage(request):
+    #TODO: get dashboard (upcoming events)
     return render(request=request,
-                  template_name='main/categories.html',
-                  context={"categories": User.objects.all})
+                  template_name='main/categories.html')
 
 def register(request):
     if request.method == "POST":
@@ -73,7 +73,9 @@ def logout_request(request):
 
 def create_event(request):
     #get some data
-    people = ['Eric', 'Brian', 'Ashkan', 'Osama', 'Anant']
+    
+    people = {user.username : f"{user.first_name} {user.last_name}" for user in User.objects.all()}
+    
     return render(request=request,
                   template_name="main/create_event.html",
                   context={"data":people})
@@ -83,24 +85,57 @@ def edit_profile(request):
                   template_name="main/edit_profile.html")
 
 def choose_skill(request):
-    skills = ['Java', 'C++', 'Kubernetes', 'Kotlin', 'Git', 'Bash']
-    return render(request=request,
-                  template_name="main/choose_skill.html",
-                  context={"data":skills})
+    
+    if request.method == 'POST':
+        
+        attendees = request.POST.getlist('names') if 'names' in request.POST else None
+        
+        all_skills = {}
+        if attendees:
+            all_skills = User_Skill.objects.filter(username=attendees[0], wants=True)
+            for i in range(len(attendees) - 1):
+                all_skills = all_skills.union(User_Skill.objects.filter(username=attendees[i],wants = True))
+            all_skills = [
+                skill
+                for skill in all_skills
+                if skill.skill_name.user_skill_set.filter(skill_level__gt=0)]
+        skills = {user_skill.skill_name_id: user_skill.skill_name.user_skill_set.count() for user_skill in all_skills}
+        
+        
+        response = render(request=request,
+                    template_name="main/choose_skill.html",
+                    context={"data":skills})
+        response.set_cookie('attendees', attendees)
+        return response
 
 def choose_lead(request):
-    available_people = ['Anant', 'Brian', 'Osama']
-    return render(request=request,
-                  template_name="main/choose_lead.html",
-                  context={"data":available_people})
+
+    if request.method == 'POST':
+        
+        skill = request.POST.get('skill')
+        teachers = User_Skill.objects.filter(skill_name_id=skill,skill_level__gt=0)
+        teachers = {
+            teacher.username_id :[
+                f"{teacher.username.first_name} {teacher.username.last_name}", 
+                teacher.skill_level]
+                for teacher in teachers}
+        
+        
+        response = render(request=request,
+                    template_name="main/choose_lead.html",
+                    context={"data":teachers})
+        response.set_cookie('skill', skill)
+        return response
+
 
 def choose_food(request):
+    #TODO
     food = ['sandwiches', 'pasta', 'soup']
     return render(request=request,
                   template_name="main/choose_food.html",
                   context={"data":food}) 
 
-def select_time(request):
+def choose_time(request):
 
     data = [
             {
@@ -161,3 +196,17 @@ def select_time(request):
     return render(request=request,
                   template_name="main/select_time.html",
                   context={"data":data})
+
+
+def confirm(request):
+    #TODO
+    """Confirm all details including date, time, teacher, skill, attendees and food options
+    """
+    #response.delete_cookie(key)
+    pass
+
+def submit(request):
+    #TODO
+    """Submit all information to database and redirect to home page
+    """
+    return redirect("main:homepage")
