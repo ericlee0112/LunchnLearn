@@ -13,5 +13,6 @@ urlpatterns = [
     path("edit_profile", views.edit_profile, name="edit_profile"),
     path("choose_skill", views.choose_skill, name="choose_skill"),
     path("choose_lead", views.choose_lead, name="choose_lead"),
-    path("choose_food", views.choose_food, name="choose_food")
+    path("choose_food", views.choose_food, name="choose_food"),
+    path("select_time", views.select_time, name="select_time")
 ]

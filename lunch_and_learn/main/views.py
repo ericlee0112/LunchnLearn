@@ -99,3 +99,65 @@ def choose_food(request):
     return render(request=request,
                   template_name="main/choose_food.html",
                   context={"data":food}) 
+
+def select_time(request):
+
+    data = [
+            {
+                "startDate": "Sun Dec 09 01:36:45 EST 2012",
+                "endDate": "Sun Dec 09 02:36:45 EST 2012",
+                "taskName":"Eric",
+                "status":"RUNNING"
+            },
+            {
+                "startDate": "Sun Dec 09 04:56:32 EST 2012",
+                "endDate":"Sun Dec 09 06:35:47 EST 2012",
+                "taskName":"Brian",
+                "status":"RUNNING"
+            },
+            {
+                "startDate": "Sun Dec 09 01:56:32 EST 2012",
+                "endDate":"Sun Dec 09 03:15:47 EST 2012",
+                "taskName":"Brian",
+                "status":"RUNNING"
+            },
+            {
+                "startDate": "Sun Dec 09 06:29:53 EST 2012",
+                "endDate":"Sun Dec 09 06:34:04 EST 2012",
+                "taskName":"Anant",
+                "status":"RUNNING"
+            },
+            {
+                "startDate": "Sun Dec 09 05:35:21 EST 2012",
+                "endDate":"Sun Dec 09 06:21:22 EST 2012",
+                "taskName":"Ashkan",
+                "status":"RUNNING"
+            },
+            {
+                "startDate":"Sun Dec 09 05:00:06 EST 2012",
+                "endDate":"Sun Dec 09 05:05:07 EST 2012",
+                "taskName":"Anant",
+                "status":"RUNNING"
+            },
+            {
+                "startDate":"Sun Dec 09 03:46:59 EST 2012",
+                "endDate":"Sun Dec 09 04:54:19 EST 2012",
+                "taskName":"Ashkan",
+                "status":"RUNNING"
+            },
+            {
+                "startDate":"Sun Dec 09 04:02:45 EST 2012",
+                "endDate":"Sun Dec 09 04:48:56 EST 2012",
+                "taskName":"Anant",
+                "status":"RUNNING"
+            },
+            {
+                "startDate":"Sun Dec 09 03:27:35 EST 2012",
+                "endDate":"Sun Dec 09 03:58:43 EST 2012",
+                "taskName":"Eric",
+                "status":"RUNNING"
+            }
+           ]
+    return render(request=request,
+                  template_name="main/select_time.html",
+                  context={"data":data})
