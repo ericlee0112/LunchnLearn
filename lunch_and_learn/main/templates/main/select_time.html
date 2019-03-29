@@ -2,298 +2,460 @@
 
 {% block content %}
 <link type="text/css" href="http://mbostock.github.io/d3/style.css" rel="stylesheet" />
-<style>
-    html,body,#wrapper {
-	width: 100%;
-	height: 100%;
-	margin: 0px;
-}
-.chart {
-	font-family: Arial, sans-serif;
-	font-size: 12px;
-}
-.axis path,.axis line {
-	fill: none;
-	stroke: #000;
-	shape-rendering: crispEdges;
-}
-.bar {
-	fill: #33b5e5;
-}
-#forkme_banner {
-	display: block;
-	position: absolute;
-	top: 0;
-	right: 10px;
-	z-index: 10;
-	padding: 10px 50px 10px 10px;
-	color: #fff;
-	background:
-		url('http://dk8996.github.io/Gantt-Chart/images/blacktocat.png')
-		#0090ff no-repeat 95% 50%;
-	font-weight: 700;
-	box-shadow: 0 0 10px rgba(0, 0, 0, .5);
-	border-bottom-left-radius: 2px;
-	border-bottom-right-radius: 2px;
-	text-decoration: none;
-}
-#twittme_banner {
-	display: block;
-	position: absolute;
-	top: 0;
-	right: 180px;
-	z-index: 10;
-	padding: 10px 50px 10px 10px;
-	color: #fff;
-	background:
-		url('http://dk8996.github.io/Gantt-Chart/images/twitter.png')
-		#0090ff no-repeat 95% 50%;
-	font-weight: 700;
-	box-shadow: 0 0 10px rgba(0, 0, 0, .5);
-	border-bottom-left-radius: 2px;
-	border-bottom-right-radius: 2px;
-	text-decoration: none;
-}
-</style>
+<link type="text/css" src="js/style.css" rel="stylesheet" />
+
 </head>
+
 <body data-js-vars=”{{data}}”>
-    <script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+	<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <!-- <script type="text/javascript" src="js/gantt.js"></script> -->
     <script>
-        /**
- * @author Dimitry Kudrayvtsev
- * @version 2.0
- */
-		d3.gantt = function() {
+        
+		d3.gantt = function () {
 			var FIT_TIME_DOMAIN_MODE = "fit";
 			var FIXED_TIME_DOMAIN_MODE = "fixed";
-			
+
 			var margin = {
-			top : 20,
-			right : 40,
-			bottom : 20,
-			left : 150
+				top: 20,
+				right: 40,
+				bottom: 20,
+				left: 150
 			};
-			var timeDomainStart = d3.time.day.offset(new Date(),-3);
-			var timeDomainEnd = d3.time.hour.offset(new Date(),+3);
+			var timeDomainStart = d3.time.day.offset(new Date(), -3);
+			var timeDomainEnd = d3.time.hour.offset(new Date(), +3);
 			var timeDomainMode = FIT_TIME_DOMAIN_MODE;// fixed or fit
 			var taskTypes = [];
 			var taskStatus = [];
-			var height = document.body.clientHeight - margin.top - margin.bottom-5;
-			var width = document.body.clientWidth - margin.right - margin.left-5;
+			var height = document.body.clientHeight - margin.top - margin.bottom - 5;
+			var width = document.body.clientWidth - margin.right - margin.left - 5;
 			var tickFormat = "%H:%M";
-			var keyFunction = function(d) {
-			return d.startDate + d.taskName + d.endDate;
+			var keyFunction = function (d) {
+				return d.startDate + d.taskName + d.endDate;
 			};
-			var rectTransform = function(d) {
-			return "translate(" + x(d.startDate) + "," + y(d.taskName) + ")";
+			var rectTransform = function (d) {
+				return "translate(" + x(d.startDate) + "," + y(d.taskName) + ")";
 			};
-			var x = d3.time.scale().domain([ timeDomainStart, timeDomainEnd ]).range([ 0, width ]).clamp(true);
-			var y = d3.scale.ordinal().domain(taskTypes).rangeRoundBands([ 0, height - margin.top - margin.bottom ], .1);
-			
+			var x = d3.time.scale().domain([timeDomainStart, timeDomainEnd]).range([0, width]).clamp(true);
+			var y = d3.scale.ordinal().domain(taskTypes).rangeRoundBands([0, height - margin.top - margin.bottom], .1);
+
 			var xAxis = d3.svg.axis().scale(x).orient("bottom").tickFormat(d3.time.format(tickFormat)).tickSubdivide(true)
 				.tickSize(8).tickPadding(8);
 			var yAxis = d3.svg.axis().scale(y).orient("left").tickSize(0);
-			var initTimeDomain = function(tasks) {
-			if (timeDomainMode === FIT_TIME_DOMAIN_MODE) {
-				if (tasks === undefined || tasks.length < 1) {
-				timeDomainStart = d3.time.day.offset(new Date(), -3);
-				timeDomainEnd = d3.time.hour.offset(new Date(), +3);
-				return;
+			var initTimeDomain = function (tasks) {
+				if (timeDomainMode === FIT_TIME_DOMAIN_MODE) {
+					if (tasks === undefined || tasks.length < 1) {
+						timeDomainStart = d3.time.day.offset(new Date(), -3);
+						timeDomainEnd = d3.time.hour.offset(new Date(), +3);
+						return;
+					}
+					tasks.sort(function (a, b) {
+						return a.endDate - b.endDate;
+					});
+					timeDomainEnd = tasks[tasks.length - 1].endDate;
+					tasks.sort(function (a, b) {
+						return a.startDate - b.startDate;
+					});
+					timeDomainStart = tasks[0].startDate;
 				}
-				tasks.sort(function(a, b) {
-				return a.endDate - b.endDate;
-				});
-				timeDomainEnd = tasks[tasks.length - 1].endDate;
-				tasks.sort(function(a, b) {
-				return a.startDate - b.startDate;
-				});
-				timeDomainStart = tasks[0].startDate;
-			}
 			};
-			var initAxis = function() {
-			x = d3.time.scale().domain([ timeDomainStart, timeDomainEnd ]).range([ 0, width ]).clamp(true);
-			y = d3.scale.ordinal().domain(taskTypes).rangeRoundBands([ 0, height - margin.top - margin.bottom ], .1);
-			xAxis = d3.svg.axis().scale(x).orient("bottom").tickFormat(d3.time.format(tickFormat)).tickSubdivide(true)
-				.tickSize(8).tickPadding(8);
-			yAxis = d3.svg.axis().scale(y).orient("left").tickSize(0);
+			var initAxis = function () {
+				x = d3.time.scale().domain([timeDomainStart, timeDomainEnd]).range([0, width]).clamp(true);
+				y = d3.scale.ordinal().domain(taskTypes).rangeRoundBands([0, height - margin.top - margin.bottom], .1);
+				xAxis = d3.svg.axis().scale(x).orient("bottom").tickFormat(d3.time.format(tickFormat)).tickSubdivide(true)
+					.tickSize(8).tickPadding(8);
+				yAxis = d3.svg.axis().scale(y).orient("left").tickSize(0);
 			};
-			
+
 			function gantt(tasks) {
-			
-			initTimeDomain(tasks);
-			initAxis();
-			
-			var svg = d3.select("body")
-			.append("svg")
-			.attr("class", "chart")
-			.attr("width", width + margin.left + margin.right)
-			.attr("height", height + margin.top + margin.bottom)
-			.append("g")
-				.attr("class", "gantt-chart")
-			.attr("width", width + margin.left + margin.right)
-			.attr("height", height + margin.top + margin.bottom)
-			.attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
-			
-			svg.selectAll(".chart")
-			.data(tasks, keyFunction).enter()
-			.append("rect")
-			.attr("rx", 5)
-				.attr("ry", 5)
-			.attr("class", function(d){ 
-				if(taskStatus[d.status] == null){ return "bar";}
-				return taskStatus[d.status];
-				}) 
-			.attr("y", 0)
-			.attr("transform", rectTransform)
-			.attr("height", function(d) { return y.rangeBand(); })
-			.attr("width", function(d) { 
-				return (x(d.endDate) - x(d.startDate)); 
-				});
-			
-			
-			svg.append("g")
-			.attr("class", "x axis")
-			.attr("transform", "translate(0, " + (height - margin.top - margin.bottom) + ")")
-			.transition()
-			.call(xAxis);
-			
-			svg.append("g").attr("class", "y axis").transition().call(yAxis);
-			
-			return gantt;
+
+				initTimeDomain(tasks);
+				initAxis();
+
+				var svg = d3.select("body")
+					.append("svg")
+					.attr("class", "chart")
+					.attr("width", width + margin.left + margin.right)
+					.attr("height", height + margin.top + margin.bottom)
+					.append("g")
+					.attr("class", "gantt-chart")
+					.attr("width", width + margin.left + margin.right)
+					.attr("height", height + margin.top + margin.bottom)
+					.attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
+
+				svg.selectAll(".chart")
+					.data(tasks, keyFunction).enter()
+					.append("rect")
+					.attr("rx", 5)
+					.attr("ry", 5)
+					.attr("class", function (d) {
+						if (taskStatus[d.status] == null) { return "bar"; }
+						return taskStatus[d.status];
+					})
+					.attr("y", 0)
+					.attr("transform", rectTransform)
+					.attr("height", function (d) { return y.rangeBand(); })
+					.attr("width", function (d) {
+						return (x(d.endDate) - x(d.startDate));
+					});
+
+
+				svg.append("g")
+					.attr("class", "x axis")
+					.attr("transform", "translate(0, " + (height - margin.top - margin.bottom) + ")")
+					.transition()
+					.call(xAxis);
+
+				svg.append("g").attr("class", "y axis").transition().call(yAxis);
+
+				return gantt;
 			};
-			
-			gantt.redraw = function(tasks) {
-			initTimeDomain();
-			initAxis();
-			
+
+			gantt.redraw = function (tasks) {
+				initTimeDomain();
+				initAxis();
+
 				var svg = d3.select("svg");
 				var ganttChartGroup = svg.select(".gantt-chart");
 				var rect = ganttChartGroup.selectAll("rect").data(tasks, keyFunction);
-				
+
 				rect.enter()
-				.insert("rect",":first-child")
-				.attr("rx", 5)
-				.attr("ry", 5)
-			.attr("class", function(d){ 
-				if(taskStatus[d.status] == null){ return "bar";}
-				return taskStatus[d.status];
-				}) 
-			.transition()
-			.attr("y", 0)
-			.attr("transform", rectTransform)
-			.attr("height", function(d) { return y.rangeBand(); })
-			.attr("width", function(d) { 
-				return (x(d.endDate) - x(d.startDate)); 
-				});
+					.insert("rect", ":first-child")
+					.attr("rx", 5)
+					.attr("ry", 5)
+					.attr("class", function (d) {
+						if (taskStatus[d.status] == null) { return "bar"; }
+						return taskStatus[d.status];
+					})
+					.transition()
+					.attr("y", 0)
+					.attr("transform", rectTransform)
+					.attr("height", function (d) { return y.rangeBand(); })
+					.attr("width", function (d) {
+						return (x(d.endDate) - x(d.startDate));
+					});
 				rect.transition()
-				.attr("transform", rectTransform)
-			.attr("height", function(d) { return y.rangeBand(); })
-			.attr("width", function(d) { 
-				return (x(d.endDate) - x(d.startDate)); 
-				});
-				
-			rect.exit().remove();
-			svg.select(".x").transition().call(xAxis);
-			svg.select(".y").transition().call(yAxis);
-			
-			return gantt;
+					.attr("transform", rectTransform)
+					.attr("height", function (d) { return y.rangeBand(); })
+					.attr("width", function (d) {
+						return (x(d.endDate) - x(d.startDate));
+					});
+
+				rect.exit().remove();
+				svg.select(".x").transition().call(xAxis);
+				svg.select(".y").transition().call(yAxis);
+
+				return gantt;
 			};
-			gantt.margin = function(value) {
-			if (!arguments.length)
-				return margin;
-			margin = value;
-			return gantt;
+			gantt.margin = function (value) {
+				if (!arguments.length)
+					return margin;
+				margin = value;
+				return gantt;
 			};
-			gantt.timeDomain = function(value) {
-			if (!arguments.length)
-				return [ timeDomainStart, timeDomainEnd ];
-			timeDomainStart = +value[0], timeDomainEnd = +value[1];
-			return gantt;
+			gantt.timeDomain = function (value) {
+				if (!arguments.length)
+					return [timeDomainStart, timeDomainEnd];
+				timeDomainStart = +value[0], timeDomainEnd = +value[1];
+				return gantt;
 			};
 			/**
 			* @param {string}
 			*                vale The value can be "fit" - the domain fits the data or
 			*                "fixed" - fixed domain.
 			*/
-			gantt.timeDomainMode = function(value) {
-			if (!arguments.length)
-				return timeDomainMode;
+			gantt.timeDomainMode = function (value) {
+				if (!arguments.length)
+					return timeDomainMode;
 				timeDomainMode = value;
 				return gantt;
 			};
-			gantt.taskTypes = function(value) {
-			if (!arguments.length)
-				return taskTypes;
-			taskTypes = value;
-			return gantt;
+			gantt.taskTypes = function (value) {
+				if (!arguments.length)
+					return taskTypes;
+				taskTypes = value;
+				return gantt;
 			};
-			
-			gantt.taskStatus = function(value) {
-			if (!arguments.length)
-				return taskStatus;
-			taskStatus = value;
-			return gantt;
+
+			gantt.taskStatus = function (value) {
+				if (!arguments.length)
+					return taskStatus;
+				taskStatus = value;
+				return gantt;
 			};
-			gantt.width = function(value) {
-			if (!arguments.length)
-				return width;
-			width = +value;
-			return gantt;
+			gantt.width = function (value) {
+				if (!arguments.length)
+					return width;
+				width = +value;
+				return gantt;
 			};
-			gantt.height = function(value) {
-			if (!arguments.length)
-				return height;
-			height = +value;
-			return gantt;
+			gantt.height = function (value) {
+				if (!arguments.length)
+					return height;
+				height = +value;
+				return gantt;
 			};
-			gantt.tickFormat = function(value) {
-			if (!arguments.length)
-				return tickFormat;
-			tickFormat = value;
-			return gantt;
+			gantt.tickFormat = function (value) {
+				if (!arguments.length)
+					return tickFormat;
+				tickFormat = value;
+				return gantt;
 			};
-			
+
 			return gantt;
 		};
-            function example() {
-                var tasks = {{ data|safe }};
-				console.log(tasks);
-				for(var i = 0; i < tasks.length; i++){
-					for(var key in tasks[i]){
-						if(key == "startDate" || key == "endDate"){
-							tasks[i][key] = new Date(tasks[i][key]);
-						}
-					}
-				}
-				console.log("new data");
-				console.log(tasks);
-			
-            var taskStatus = {
-                "RUNNING" : "bar"
-            };
-            var taskNames = [ "Eric", "Brian", "Anant", "Ashkan"];
-            tasks.sort(function(a, b) {
-                return a.endDate - b.endDate;
-            });
-            var maxDate = tasks[tasks.length - 1].endDate;
-            tasks.sort(function(a, b) {
-                return a.startDate - b.startDate;
-            });
-            var minDate = tasks[0].startDate;
-            var format = "%H:%M";
-            var gantt = d3.gantt().taskTypes(taskNames).taskStatus(taskStatus).tickFormat(format);
-            gantt(tasks);
-        };
-example();
     </script>
-    <form action='choose_lead' method='GET'>
-            <label for="team_name">Start Time:</label>
-                <input id="team_name" type="text" name="position" value="">
-            <label for="team_name">End Time:</label>
-                <input id="team_name" type="text" name="position" value="">
-            <button type='submit'>Create Event</button>
-    </form>
-    <h3>Invitee Availabilities</h3>
+    <script src="https://apis.google.com/js/client.js?onload=handleClientLoad" type="text/javascript"></script>
+    <script> 
+		
+    
+		
+		var clientId = '598091712371-gvu9pk89c0gmgnbh3useo8bqvefeudgp.apps.googleusercontent.com';
+		var apiKey = 'AIzaSyDa0dJEC8BZ5WzXZswNTPO8-Fh9wZZL7fM';
+		var scopes = 'https://www.googleapis.com/auth/calendar';
+		var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
+
+		
+		function handleClientLoad() {
+			gapi.client.setApiKey(apiKey);
+			window.setTimeout(checkAuth, 1);
+			checkAuth();
+		}
+
+		function checkAuth() {
+			gapi.auth.authorize({ client_id: clientId, scope: scopes, immediate: true },
+				handleAuthResult);
+		}
+
+		function handleAuthResult(authResult) {
+			var authorizeButton = document.getElementById('authorize-button');
+			if (authResult) {
+				authorizeButton.style.visibility = 'hidden';
+				makeApiCall();
+			} else {
+				authorizeButton.style.visibility = '';
+				authorizeButton.onclick = handleAuthClick;
+			}
+		}
+
+		function handleAuthClick(event) {
+			gapi.auth.authorize(
+				{ client_id: clientId, scope: scopes, immediate: false },
+				handleAuthResult);
+			return false;
+        }
+        
+		function makeApiCall() {
+				console.log('calling api');
+				gapi.client.load('calendar', 'v3', function () {
+					var request = gapi.client.calendar.events.list({
+                        'anantkandadai@gmail.com': 'primary'
+					});
+
+					request.execute(function (resp) {
+						console.log('got resp');
+						console.log(resp);
+						for (var i = 0; i < resp.items.length; i++) {
+							var li = document.createElement('li');
+							li.appendChild(document.createTextNode(resp.items[i].summary));
+							document.getElementById('events').appendChild(li);
+						}
+					});
+				});
+		}
+	
+		//handleClientLoad();
+		console.log("gapi: ", gapi);
+		console.log("client: ", gapi['client']);
+
+		makeApiCall();
+	</script>
+
+	<form action='choose_lead' method='GET'>
+		<label for="team_name">Start Time:</label>
+		<input id="team_name" type="text" name="position" value="">
+		<label for="team_name">End Time:</label>
+		<input id="team_name" type="text" name="position" value="">
+		<button type='submit'>Create Event</button>
+	</form>
+	<h3>Invitee Availabilities</h3>
+
+	<button id="authorize_button" style="display: none;">Authorize</button>
+    <button id="signout_button" style="display: none;">Sign Out</button>
+
+    <pre id="content" style="white-space: pre-wrap;"></pre>
+
+    <script type="text/javascript">
+	  // Client ID and API key from the Developer Console
+
+      var CLIENT_ID = '598091712371-gvu9pk89c0gmgnbh3useo8bqvefeudgp.apps.googleusercontent.com';
+      var API_KEY = 'AIzaSyDa0dJEC8BZ5WzXZswNTPO8-Fh9wZZL7fM';
+
+      // Array of API discovery doc URLs for APIs used by the quickstart
+      var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
+
+      // Authorization scopes required by the API; multiple scopes can be
+      // included, separated by spaces.
+      var SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
+
+      var authorizeButton = document.getElementById('authorize_button');
+      var signoutButton = document.getElementById('signout_button');
+
+      /**
+       *  On load, called to load the auth2 library and API client library.
+       */
+      function handleClientLoad() {
+        gapi.load('client:auth2', initClient);
+      }
+
+      /**
+       *  Initializes the API client library and sets up sign-in state
+       *  listeners.
+       */
+      function initClient() {
+        gapi.client.init({
+          apiKey: API_KEY,
+          clientId: CLIENT_ID,
+          discoveryDocs: DISCOVERY_DOCS,
+          scope: SCOPES
+        }).then(function () {
+          // Listen for sign-in state changes.
+          gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
+
+          // Handle the initial sign-in state.
+          updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+          authorizeButton.onclick = handleAuthClick;
+          signoutButton.onclick = handleSignoutClick;
+        }, function(error) {
+          appendPre(JSON.stringify(error, null, 2));
+        });
+      }
+
+      /**
+       *  Called when the signed in status changes, to update the UI
+       *  appropriately. After a sign-in, the API is called.
+       */
+      function updateSigninStatus(isSignedIn) {
+        if (isSignedIn) {
+          authorizeButton.style.display = 'none';
+          signoutButton.style.display = 'block';
+          listUpcomingEvents();
+        } else {
+          authorizeButton.style.display = 'block';
+          signoutButton.style.display = 'none';
+        }
+      }
+
+      /**
+       *  Sign in the user upon button click.
+       */
+      function handleAuthClick(event) {
+        gapi.auth2.getAuthInstance().signIn();
+      }
+
+      /**
+       *  Sign out the user upon button click.
+       */
+      function handleSignoutClick(event) {
+        gapi.auth2.getAuthInstance().signOut();
+      }
+
+      /**
+       * Append a pre element to the body containing the given message
+       * as its text node. Used to display the results of the API call.
+       *
+       * @param {string} message Text to be placed in pre element.
+       */
+      function appendPre(message) {
+        var pre = document.getElementById('content');
+        var textContent = document.createTextNode(message + '\n');
+        pre.appendChild(textContent);
+      }
+
+      /**
+       * Print the summary and start datetime/date of the next ten events in
+       * the authorized user's calendar. If no events are found an
+       * appropriate message is printed.
+       */
+      function listUpcomingEvents() {
+        gapi.client.calendar.freebusy.query(
+			  {
+				  "timeMax": "2019-04-03T00:00:00Z",
+				  "timeMin": "2019-03-22T00:00:00Z",
+				  "items": [
+					  {
+                          "id": "anantkandadai@gmail.com",
+                      },
+                      {
+                           "id": "jaehyunlee98@gmail.com" 
+                      }
+				  ]
+			  }).then(function(response) {
+          var body = JSON.parse(response.body);
+		  appendPre('Busy times:');
+		  var calendars = body.calendars;
+          console.log(calendars);
+		  for (var id in calendars) {
+			  busyTimes = calendars[id].busy;
+			  
+			for (var j = 0; j < busyTimes.length; j++){
+				appendPre(id)
+				appendPre(busyTimes[j].start);
+				appendPre(busyTimes[j].end);
+
+            }
+            example(calendars);
+		  }
+				
+        });
+      }
+
+      function example(calendars) {
+            //var tasks = {{ data| safe }};
+            var reformatted_data = [];
+            var emails = [];
+            
+		for (var email in calendars) {
+            busyTimes = calendars[email].busy;
+            emails.push(email);
+            var object = {};
+            for(var i = 0; i < busyTimes.length; i++ ){
+                object.startDate = new Date(busyTimes[i].start);
+                object.endDate = new Date(busyTimes[i].end);
+                object.taskName = email;
+                object.status = "RUNNING";
+                reformatted_data.push(object);
+            }
+        }
+        console.log(reformatted_data);
+
+		var taskStatus = {
+			"RUNNING": "bar"
+		};
+		reformatted_data.sort(function (a, b) {
+			return a.endDate - b.endDate;
+		});
+		var maxDate = reformatted_data[reformatted_data.length - 1].endDate;
+		reformatted_data.sort(function (a, b) {
+			return a.startDate - b.startDate;
+		});
+		var minDate = reformatted_data[0].startDate;
+		var format = "%H:%M";
+		var gantt = d3.gantt().taskTypes(emails).taskStatus(taskStatus).tickFormat(format);
+		gantt(reformatted_data);
+        };
+
+
+	  
+    </script>
+
+    <script async defer src="https://apis.google.com/js/api.js"
+      onload="this.onload=function(){};handleClientLoad()"
+      onreadystatechange="if (this.readyState === 'complete') this.onload()">
+    </script>
+
+
 </body>
+
 </html>
-{% endblock %} 
+{% endblock %}

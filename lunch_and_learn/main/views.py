@@ -108,6 +108,10 @@ def choose_skill(request):
         response.set_cookie('attendees', attendees)
         return response
 
+def enter_date(request):
+    return render(request=request,
+                    template_name="main/enter_date.html")
+
 def choose_lead(request):
 
     if request.method == 'POST':
@@ -136,6 +140,15 @@ def choose_food(request):
                   context={"data":food}) 
 
 def choose_time(request):
+
+    data = {
+        "email":{
+            "busy": [
+                {"start": "2019-03-25T12:00:00Z", "end": "2019-03-25T13:00:00Z"},
+                {"start": "2019-03-26T21:00:00Z", "end": "2019-03-26T22:00:00Z"}
+            ]
+        }
+    }
 
     data = [
             {
@@ -187,8 +200,14 @@ def choose_time(request):
                 "status":"RUNNING"
             },
             {
-                "startDate":"Sun Dec 09 03:27:35 EST 2012",
-                "endDate":"Sun Dec 09 03:58:43 EST 2012",
+                "startDate":"Sun Dec 09 2012 03:00:00 GMT-0500 (Eastern Standard Time)",
+                "endDate":"Sun Dec 09 2012 03:40:00 GMT-0500 (Eastern Standard Time)",
+                "taskName":"Eric",
+                "status":"RUNNING"
+            },
+            {
+                "startDate":"2012-12-09T03:00:00Z",
+                "endDate":"2012-12-09T03:40:00Z",
                 "taskName":"Eric",
                 "status":"RUNNING"
             }
