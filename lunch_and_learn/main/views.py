@@ -7,16 +7,7 @@ from django.contrib.auth import logout, authenticate, login
 from django.contrib import messages
 from .forms import NewUserForm
 
-# Create your views here.
 
-'''
-class UserList(generics.ListAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-'''
-
-class UserList(generics.ListAPIView):
-    serializer_class = UserSerializer
 
 def homepage(request):
     #TODO: get dashboard (upcoming events)
@@ -72,7 +63,7 @@ def logout_request(request):
     return redirect("main:homepage")
 
 def create_event(request):
-    #get some data
+
     
     people = {user.username : f"{user.first_name} {user.last_name}" for user in User.objects.all()}
     
@@ -226,6 +217,12 @@ def confirm(request):
 
 def submit(request):
     #TODO
+    if request.method == 'POST':
+        items = request.POST
+        skill,teacher,organizer,start_dt,end_dt = items.get('skill'),items.get('teacher'),items.get('organizer'),items.get('start_date_time'),items.get('end_date_time')
+        
+        Event(skill=skill,teacher=teacher,organizer=organizer,start_dt=start_dt,end_dt=end_dt).save()
+
     """Submit all information to database and redirect to home page
     """
     return redirect("main:homepage")
