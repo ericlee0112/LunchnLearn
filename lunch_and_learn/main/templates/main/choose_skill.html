@@ -7,21 +7,18 @@
         {% csrf_token %}
         <label>Select a skill to talk about</label>
 
-            
-                    {% for skill in data %}
-                    <br>
-                        <label>
-                            <input type="checkbox" value="True">
-                            <span>
-                                {{skill}}
-                            </span>
-                        </label>
-                    {% endfor %}
-                    
-               
-</div>      
-<form action='select_time' method='GET'>
-     <button type='submit'>Next</button>
+
+        {% for skill, count in data.items %}
+        <br>
+        <label>
+            <input type="radio" name='skill' value="{{skill}}">
+            <span>
+                {{skill}}: {{count}}
+            </span>
+        </label>
+        {% endfor %}
+        <br>
+        <button type='submit'>Next</button>
     </form>
 </div>
 {% endblock %}
