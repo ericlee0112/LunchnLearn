@@ -444,6 +444,11 @@ pre.appendChild(textContent);
 * appropriate message is printed.
 */
 function listUpcomingEvents() {
+    console.log(document.getElementById('start_time_window').value);
+    console.log(document.getElementById('end_time_window').value);
+    var start = document.getElementById('start_time_window').value + "T06:00:00Z";
+    var end = document.getElementById('end_time_window').value + "T06:00:00Z";
+    
 gapi.client.calendar.freebusy.query(
              {
                  "timeMax": "2019-04-02T00:00:00Z",
