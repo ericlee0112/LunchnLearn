@@ -8,7 +8,7 @@
 
 <body data-js-vars=”{{data}}”>
 	<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<!-- <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
     <!-- <script type="text/javascript" src="js/gantt.js"></script> -->
     <script>
         
@@ -206,78 +206,21 @@
 		};
     </script>
     <script src="https://apis.google.com/js/client.js?onload=handleClientLoad" type="text/javascript"></script>
-    <script> 
-		
-    
-		
-		var clientId = '598091712371-gvu9pk89c0gmgnbh3useo8bqvefeudgp.apps.googleusercontent.com';
-		var apiKey = 'AIzaSyDa0dJEC8BZ5WzXZswNTPO8-Fh9wZZL7fM';
-		var scopes = 'https://www.googleapis.com/auth/calendar';
-		var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
-
-		
-		function handleClientLoad() {
-			gapi.client.setApiKey(apiKey);
-			window.setTimeout(checkAuth, 1);
-			checkAuth();
-		}
-
-		function checkAuth() {
-			gapi.auth.authorize({ client_id: clientId, scope: scopes, immediate: true },
-				handleAuthResult);
-		}
-
-		function handleAuthResult(authResult) {
-			var authorizeButton = document.getElementById('authorize-button');
-			if (authResult) {
-				authorizeButton.style.visibility = 'hidden';
-				makeApiCall();
-			} else {
-				authorizeButton.style.visibility = '';
-				authorizeButton.onclick = handleAuthClick;
-			}
-		}
-
-		function handleAuthClick(event) {
-			gapi.auth.authorize(
-				{ client_id: clientId, scope: scopes, immediate: false },
-				handleAuthResult);
-			return false;
-        }
-        
-		function makeApiCall() {
-				console.log('calling api');
-				gapi.client.load('calendar', 'v3', function () {
-					var request = gapi.client.calendar.events.list({
-                        'anantkandadai@gmail.com': 'primary'
-					});
-
-					request.execute(function (resp) {
-						console.log('got resp');
-						console.log(resp);
-						for (var i = 0; i < resp.items.length; i++) {
-							var li = document.createElement('li');
-							li.appendChild(document.createTextNode(resp.items[i].summary));
-							document.getElementById('events').appendChild(li);
-						}
-					});
-				});
-		}
-	
-		//handleClientLoad();
-		console.log("gapi: ", gapi);
-		console.log("client: ", gapi['client']);
-
-		makeApiCall();
-	</script>
 
 	<form action='choose_lead' method='GET'>
-		<label for="team_name">Start Time:</label>
-		<input id="team_name" type="text" name="position" value="">
-		<label for="team_name">End Time:</label>
-		<input id="team_name" type="text" name="position" value="">
+		<label for="start_time">Start Time:</label>
+		<input id="start_time" type="text" name="position" value="">
+		<label for="end_time">End Time:</label>
+		<input id="end_time" type="text" name="position" value="">
 		<button type='submit'>Create Event</button>
 	</form>
+
+		<label for="start_time_window">Calendar Window Start:</label>
+		<input id="start_time_window" type="text" name="position" value="">
+		<label for="end_time_window">Calendar Window End:</label>
+		<input id="end_time_window" type="text" name="position" value="">
+		<button type='button' onclick="listUpcomingEvents()">Refresh calendar</button>
+
 	<h3>Invitee Availabilities</h3>
 
 	<button id="authorize_button" style="display: none;">Authorize</button>
@@ -288,7 +231,7 @@
     <script type="text/javascript">
 	  // Client ID and API key from the Developer Console
 
-      var CLIENT_ID = '598091712371-gvu9pk89c0gmgnbh3useo8bqvefeudgp.apps.googleusercontent.com';
+      var CLIENT_ID = '598091712371-4692gi02rn9ou6cko433875rmljo1rmj.apps.googleusercontent.com';
       var API_KEY = 'AIzaSyDa0dJEC8BZ5WzXZswNTPO8-Fh9wZZL7fM';
 
       // Array of API discovery doc URLs for APIs used by the quickstart
@@ -377,11 +320,20 @@
        * the authorized user's calendar. If no events are found an
        * appropriate message is printed.
        */
+
+
+			//TODO: replace accounts below with template data
+			//TODO: implement date time error checking and prompts
       function listUpcomingEvents() {
+				appendPre("you made it??")
+				var timeMax = document.getElementById('end_time_window').value;
+				var timeMin = document.getElementById('start_time_window').value;
+				timeMax = new Date(timeMax);
+				console.log(timeMax, typeof(timeMax));
         gapi.client.calendar.freebusy.query(
 			  {
-				  "timeMax": "2019-04-03T00:00:00Z",
-				  "timeMin": "2019-03-22T00:00:00Z",
+				  "timeMax": timeMax,
+				  "timeMin": timeMin,
 				  "items": [
 					  {
                           "id": "anantkandadai@gmail.com",
@@ -392,22 +344,23 @@
 				  ]
 			  }).then(function(response) {
           var body = JSON.parse(response.body);
-		  appendPre('Busy times:');
+		  //appendPre('Busy times:');
 		  var calendars = body.calendars;
           console.log(calendars);
 		  for (var id in calendars) {
 			  busyTimes = calendars[id].busy;
 			  
 			for (var j = 0; j < busyTimes.length; j++){
-				appendPre(id)
-				appendPre(busyTimes[j].start);
-				appendPre(busyTimes[j].end);
+				//appendPre(id)
+				//appendPre(busyTimes[j].start);
+				//appendPre(busyTimes[j].end);
 
             }
             example(calendars);
 		  }
 				
-        });
+				});
+				return false;
       }
 
       function example(calendars) {
