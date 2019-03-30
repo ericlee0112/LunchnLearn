@@ -15,6 +15,5 @@ urlpatterns = [
     path("choose_time", views.choose_time, name="choose_time"),
     path("choose_food", views.choose_food, name="choose_food"),
     path("confirm", views.confirm, name="confirm"),
-    path("submit", views.submit, name="submit"),
-    path("enter_date", views.enter_date, name="enter_date")
+    path("submit", views.submit, name="submit")
 ]
