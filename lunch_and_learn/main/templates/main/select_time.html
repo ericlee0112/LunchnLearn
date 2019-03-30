@@ -330,19 +330,26 @@
 		makeApiCall();
 	</script>
 
-	<form action='choose_lead' method='GET'>
-		<label for="team_name">Start Time:</label>
-		<input id="team_name" type="text" name="position" value="">
-		<label for="team_name">End Time:</label>
-		<input id="team_name" type="text" name="position" value="">
-		<button type='submit'>Create Event</button>
-	</form>
-	<h3>Invitee Availabilities</h3>
+    <form action='choose_lead' method='GET'>
+        <label for="start_time">Start Time:</label>
+        <input id="start_time" type="text" name="position" value="">
+        <label for="end_time">End Time:</label>
+        <input id="end_time" type="text" name="position" value="">
+            <button type='submit'>Create Event</button>
+    </form>
 
-	<button id="authorize_button" style="display: none;">Authorize</button>
-    <button id="signout_button" style="display: none;">Sign Out</button>
-
-    <pre id="content" style="white-space: pre-wrap;"></pre>
+    <form>
+        <label for="start_time_window">Calendar Window Start:</label>
+        <input id="start_time_window" type="date" name="position" value="">
+        <label for="end_time_window">Calendar Window End:</label>
+        <input id="end_time_window" type="date" name="position" value="">
+        <button type='button' onclick="listUpcomingEvents()">Refresh calendar</button>
+    </form>
+        <h3>Invitee Availabilities</h3>
+        <button id="authorize_button" style="display: none;">Authorize</button>
+        <button id="signout_button" style="display: none;">Sign Out</button>
+        <pre id="content" style="white-space: pre-wrap;"></pre>
+        
 
     <script type="text/javascript">
 	  // Client ID and API key from the Developer Console
@@ -438,6 +445,7 @@
        * appropriate message is printed.
        */
       function listUpcomingEvents() {
+              
         gapi.client.calendar.freebusy.query(
 			  {
 				  "timeMax": "2019-04-02T00:00:00Z",

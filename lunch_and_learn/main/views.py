@@ -108,10 +108,6 @@ def choose_skill(request):
         response.set_cookie('attendees', attendees)
         return response
 
-def enter_date(request):
-    return render(request=request,
-                    template_name="main/enter_date.html")
-
 def choose_lead(request):
 
     if request.method == 'POST':
@@ -141,80 +137,10 @@ def choose_food(request):
 
 def choose_time(request):
 
-    data = {
-        "email":{
-            "busy": [
-                {"start": "2019-03-25T12:00:00Z", "end": "2019-03-25T13:00:00Z"},
-                {"start": "2019-03-26T21:00:00Z", "end": "2019-03-26T22:00:00Z"}
-            ]
-        }
-    }
-
-    data = [
-            {
-                "startDate": "Sun Dec 09 01:36:45 EST 2012",
-                "endDate": "Sun Dec 09 02:36:45 EST 2012",
-                "taskName":"Eric",
-                "status":"RUNNING"
-            },
-            {
-                "startDate": "Sun Dec 09 04:56:32 EST 2012",
-                "endDate":"Sun Dec 09 06:35:47 EST 2012",
-                "taskName":"Brian",
-                "status":"RUNNING"
-            },
-            {
-                "startDate": "Sun Dec 09 01:56:32 EST 2012",
-                "endDate":"Sun Dec 09 03:15:47 EST 2012",
-                "taskName":"Brian",
-                "status":"RUNNING"
-            },
-            {
-                "startDate": "Sun Dec 09 06:29:53 EST 2012",
-                "endDate":"Sun Dec 09 06:34:04 EST 2012",
-                "taskName":"Anant",
-                "status":"RUNNING"
-            },
-            {
-                "startDate": "Sun Dec 09 05:35:21 EST 2012",
-                "endDate":"Sun Dec 09 06:21:22 EST 2012",
-                "taskName":"Ashkan",
-                "status":"RUNNING"
-            },
-            {
-                "startDate":"Sun Dec 09 05:00:06 EST 2012",
-                "endDate":"Sun Dec 09 05:05:07 EST 2012",
-                "taskName":"Anant",
-                "status":"RUNNING"
-            },
-            {
-                "startDate":"Sun Dec 09 03:46:59 EST 2012",
-                "endDate":"Sun Dec 09 04:54:19 EST 2012",
-                "taskName":"Ashkan",
-                "status":"RUNNING"
-            },
-            {
-                "startDate":"Sun Dec 09 04:02:45 EST 2012",
-                "endDate":"Sun Dec 09 04:48:56 EST 2012",
-                "taskName":"Anant",
-                "status":"RUNNING"
-            },
-            {
-                "startDate":"Sun Dec 09 2012 03:00:00 GMT-0500 (Eastern Standard Time)",
-                "endDate":"Sun Dec 09 2012 03:40:00 GMT-0500 (Eastern Standard Time)",
-                "taskName":"Eric",
-                "status":"RUNNING"
-            },
-            {
-                "startDate":"2012-12-09T03:00:00Z",
-                "endDate":"2012-12-09T03:40:00Z",
-                "taskName":"Eric",
-                "status":"RUNNING"
-            }
-           ]
+    data = ['jaehyunlee98@gmail.com', 'anantkandadai@gmail.com'];
     return render(request=request,
                   template_name="main/select_time.html",
-                  context={"data":data})
+                  context={"emails":data})
 
 
 def confirm(request):
