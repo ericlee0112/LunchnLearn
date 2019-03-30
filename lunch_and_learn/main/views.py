@@ -84,13 +84,20 @@ def choose_skill(request):
         all_skills = {}
         if attendees:
             all_skills = User_Skill.objects.filter(username=attendees[0], wants=True)
-            for i in range(len(attendees) - 1):
+            for i in range(1, len(attendees)):
                 all_skills = all_skills.union(User_Skill.objects.filter(username=attendees[i],wants = True))
-            all_skills = [
-                skill
-                for skill in all_skills
-                if skill.skill_name.user_skill_set.filter(skill_level__gt=0)]
-        skills = {user_skill.skill_name_id: user_skill.skill_name.user_skill_set.count() for user_skill in all_skills}
+                
+            
+            print('all skills: ', all_skills.values_list())
+            new_skills=[]
+            for skill in all_skills:
+                teachers = skill.skill_name.user_skill_set.filter(skill_level__gt=0)
+                print("potential: ",teachers)
+                if ([t for t in teachers if t.username_id in attendees]):
+                    new_skills.append(skill)
+
+            print('teachable skills: ', [i.skill_name_id for i in new_skills])
+        skills = {user_skill.skill_name_id: user_skill.skill_name.user_skill_set.count() for user_skill in new_skills}
         
         
         response = render(request=request,
@@ -106,16 +113,24 @@ def enter_date(request):
 def choose_lead(request):
 
     if request.method == 'POST':
+        attendees = set(
+            map(
+                lambda s: s.strip(), 
+                request.COOKIES.get('attendees').strip('\"[]').replace("'", "").split(',')
+                    ))
         
         skill = request.POST.get('skill')
+        print(attendees)
         teachers = User_Skill.objects.filter(skill_name_id=skill,skill_level__gt=0)
+        print([(teacher.username_id, teacher.username_id in attendees) for teacher in teachers])
         teachers = {
             teacher.username_id :[
                 f"{teacher.username.first_name} {teacher.username.last_name}", 
                 teacher.skill_level]
-                for teacher in teachers}
+                for teacher in teachers 
+                if teacher.username_id in attendees}
         
-        
+        print(teachers)
         response = render(request=request,
                     template_name="main/choose_lead.html",
                     context={"data":teachers})
