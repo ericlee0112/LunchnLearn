@@ -31,13 +31,25 @@ print('successful api build')
 
 def homepage(request):
 
-    user = request.COOKIES.get('signed_in')
+    user_email = request.COOKIES.get('signed_in')
+    
     auth = False
     events = None
-    if user:
+    if user_email:
         auth = True
-        user = User.objects.filter(username=user)[0]
-        #coming_events = Event.objects.filter(start_date_time__gt = datetime.now())
+        
+        user = User.objects.filter(username=user_email)
+        if not user:
+            first_name = request.COOKIES.get('first_name')
+            last_name = request.COOKIES.get('last_name')
+            print(request.COOKIES)
+            User(username=user_email, first_name=first_name, last_name=last_name).save()
+            print('created new user!')
+            response =redirect("main:edit_profile")
+            response.delete_cookie('first_name')
+            response.delete_cookie('last_name')
+            return response
+        user = user[0]
         events = [i.event_id for i in user.event_attendees_set.all() if i.event_id.start_date_time > datetime.now(pytz.utc)]
         events = [{
             'start_date_time':str(e.start_date_time),
@@ -51,53 +63,53 @@ def homepage(request):
                   template_name='main/categories.html',
                   context={"data":events, "user":{"is_authenticated":auth}})
 
-def register(request):
-    if request.method == "POST":
-        form = NewUserForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            username = form.cleaned_data.get('username')
-            messages.success(request, f"New account created: {username}")
-            login(request, user)
-            return redirect("main:homepage")
+# def register(request):
+#     if request.method == "POST":
+#         form = NewUserForm(request.POST)
+#         if form.is_valid():
+#             user = form.save()
+#             username = form.cleaned_data.get('username')
+#             messages.success(request, f"New account created: {username}")
+#             login(request, user)
+#             return redirect("main:homepage")
 
-        else:
-            for msg in form.error_messages:
-                messages.error(request, f"{msg}: {form.error_messages[msg]}")
+#         else:
+#             for msg in form.error_messages:
+#                 messages.error(request, f"{msg}: {form.error_messages[msg]}")
 
-            return render(request = request,
-                          template_name = "main/register.html",
-                          context={"form":form})
+#             return render(request = request,
+#                           template_name = "main/register.html",
+#                           context={"form":form})
 
-    form = NewUserForm
-    return render(request = request,
-                  template_name = "main/register.html",
-                  context={"form":form})
+#     form = NewUserForm
+#     return render(request = request,
+#                   template_name = "main/register.html",
+#                   context={"form":form})
 
-def login_request(request):
-    if request.method == 'POST':
-        form = AuthenticationForm(request=request, data=request.POST)
-        if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                login(request, user)
-                messages.info(request, f"You are now logged in as {username}")
-                return redirect('/')
-            else:
-                messages.error(request, "Invalid username or password.")
-        else:
-            messages.error(request, "Invalid username or password.")
-    form = AuthenticationForm()
-    return render(request = request,
-                    template_name = "main/login.html",
-                    context={"form":form})
+# def login_request(request):
+#     if request.method == 'POST':
+#         form = AuthenticationForm(request=request, data=request.POST)
+#         if form.is_valid():
+#             username = form.cleaned_data.get('username')
+#             password = form.cleaned_data.get('password')
+#             user = authenticate(username=username, password=password)
+#             if user is not None:
+#                 login(request, user)
+#                 messages.info(request, f"You are now logged in as {username}")
+#                 return redirect('/')
+#             else:
+#                 messages.error(request, "Invalid username or password.")
+#         else:
+#             messages.error(request, "Invalid username or password.")
+#     form = AuthenticationForm()
+#     return render(request = request,
+#                     template_name = "main/login.html",
+#                     context={"form":form})
 
-def logout_request(request):
-    logout(request)
-    messages.info(request, "Logged out successfully!")
-    return redirect("main:homepage")
+# def logout_request(request):
+#     logout(request)
+#     messages.info(request, "Logged out successfully!")
+#     return redirect("main:homepage")
 
 def create_event(request):
 
@@ -134,7 +146,7 @@ def edit_profile(request):
             knows = items.get(skill + "_know"), items.get(skill + "_know_val")
             # print(wants, knows)
             if wants[0] and wants[1]:
-                new_skills[skill] = {"wants":True, "skill_level": max(int(wants[1]), int(knows[1]) if knows[1] else 0)}
+                new_skills[skill] = {"wants":True, "skill_level": max(int(wants[1]), int(knows[1]) if knows[0] else 0)}
                 continue
             if knows[0] and knows[1] and int(knows[1][0]) > 0:
                 new_skills[skill] = {"wants": False, "skill_level": int(knows[1])}
@@ -281,6 +293,8 @@ def submit(request):
         print("Event: ", event.get('htmlLink'), 'more:\n', event)
 
 
-    """Submit all information to database and redirect to home page
-    """
-    return redirect("main:homepage")
+    response = redirect("main:homepage")
+    response.delete_cookie('teacher')
+    response.delete_cookie('skill')
+    response.delete_cookie('attendees')
+    return response
