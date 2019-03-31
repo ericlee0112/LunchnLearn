@@ -1,34 +1,58 @@
 {% extends 'main/header.html' %}
 
 {% block content %}
-<!--
-<form method="POST" action="">
-        {% csrf_token %}
-        {{ form }}
-        <input type="submit" value="Save">
-</form>
--->
-<label>Edit Profile</label>
-<form action="/team_name_url/" method="post">
-    <label for="team_name">Name:</label>
-    <input id="team_name" type="text" name="position" value="">
-    <label for="team_name">Department:</label>
-    <input id="team_name" type="text" name="position" value="">
-    <label for="team_name">Position:</label>
-    <input id="team_name" type="text" name="position" value="">
-    <label for="team_name">What skills do you know:</label>
-    <input id="team_name" type="text" name="position" value="">
-    <input id="team_name" type="text" name="position" value="">
-    <input id="team_name" type="text" name="position" value="">
-    <input id="team_name" type="text" name="position" value="">
-    <input id="team_name" type="text" name="position" value="">
-    <label for="awef">What skills do you want to learn:</label>
-    <input id="team_name" type="text" name="position" value="">
-    <input id="team_name" type="text" name="position" value="">
-    <input id="team_name" type="text" name="position" value="">
-    <input id="team_name" type="text" name="position" value="">
-    <input id="team_name" type="text" name="position" value="">
+
+<H2>Edit Profile</h2>
+<form action="edit_profile" method="POST">
+    {% csrf_token %}
+    <span>
+        Name: {{name}}
+    </span>
+    <br>
+    <h5>What skills do you want to learn:</h5>
+    {% for skill,level in skills_want.items %}
+    <label>
+        <input type="checkbox" name="{{skill}}_want" value="{{skill}}" checked>
+        <span>
+            {{skill}}
+        </span>
+        
+        <input type="number" id="skill" name="{{skill}}_want_val" min="-1" max="10"value="{{level}}">
+        <label>skill level</label><br>
+    </label>
+    {% endfor %}
+    {% for skill in new_skills_want %}
+    <label>
+        <input type="checkbox" name="{{skill}}_want" value="{{skill}}">
+        <span>
+            {{skill}}
+        </span>
+        <input type="number" name="{{skill}}_want_val" min="-1" max="10" value="0">
+        <label>skill level</label><br>
+    </label>
+    {% endfor %}
+    <h5>What skills do you know:</h5>
+    {% for skill,level in skills_know.items %}
+    <label>
+        <input type="checkbox" name="{{skill}}_know" value="{{skill}}" checked>
+        <span>
+            {{skill}}
+        </span>
+        <input type="number" name="{{skill}}_know_val" min="1" max="10" value="{{level}}">
+        <label>skill level</label><br>
+    </label>
+    {% endfor %}
+    {% for skill in new_skills_know %}
+    <label>
+        <input type="checkbox" name="{{skill}}_know" value="{{skill}}">
+        <span>
+            {{skill}}
+        </span>
+        <input type="number" name="{{skill}}_know_val" min="1" max="10" value="1">
+        <label>skill level</label><br>
+    </label>
+    {% endfor %}
     <input type="submit" value="OK">
-</form>           
-       
+</form>
+
 {% endblock %}
