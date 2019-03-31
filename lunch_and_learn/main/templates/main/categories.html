@@ -1,6 +1,11 @@
 {% extends 'main/header.html' %}
 
 {% block content %}
+<head>
+        <meta name="google-signin-scope" content="profile email">
+        <meta name="google-signin-client_id" content="598091712371-4692gi02rn9ou6cko433875rmljo1rmj.apps.googleusercontent.com">
+        <script src="https://apis.google.com/js/platform.js" async defer></script>
+</head>
 {% if user.is_authenticated %}
     <div class="row">
         {% for cat in categories %}
@@ -17,8 +22,60 @@
             </div>
         {% endfor %}
     </div>
-{% endif %}
+<h3>Upcoming Events</h3>
+<table style="width:100%">
+    <tr>
+        {% for title in data.0 %}
+        <th>{{title}}</th>
+        {% endfor %}
+    </tr>
+    {% for event in data %}
+    <tr>
+        {% for key, val in event.items %}
+        <td>
+            {{val}}
+        </td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
 <form action='create_event' method='GET'>
     <button type='submit'>Create Event</button>
 </form>
+<a href="#" onclick="signOut();">Sign out</button>
+<div class="g-signin2" style="display: none" data-onsuccess="onSignIn" data-theme="dark"></div>
+<script>
+        function signOut() {
+          var auth2 = gapi.auth2.getAuthInstance();
+          auth2.signOut().then(function () {
+            console.log('User signed out.');
+            document.cookie = "signed_in=";
+            window.location.replace('')
+          });
+        }
+</script>
+
+{% endif %}
+{% if not user.is_authenticated %}
+  <body>
+      <br><br><br>
+    <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+    <script>
+      function onSignIn(googleUser) {
+        // Useful data for your client-side scripts:
+        var profile = googleUser.getBasicProfile();
+        var email = profile.getEmail();
+        
+        
+        document.cookie = "signed_in="+email;
+        document.cookie = "first_name=" + profile.getGivenName();
+        document.cookie = "last_name=" + profile.getFamilyName();
+        // The ID token you need to pass to your backend:
+        var id_token = googleUser.getAuthResponse().id_token;
+        window.location.replace('')
+      }
+    </script>
+
+  </body>
+{% endif %}
 {% endblock %}
