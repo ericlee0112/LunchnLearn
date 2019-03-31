@@ -2,23 +2,33 @@
 
 {% block content %}
 
+{% if data %}
 <div id="checkboxes">
     <form action='choose_lead' method='POST'>
         {% csrf_token %}
         <label>Select a skill to talk about</label>
 
+
         {% for skill, count in data.items %}
         <br>
         <label>
-            <input type="radio" name="skill" value="{{skill}}">
+            <input type="radio" name='skill' value="{{skill}}">
             <span>
                 {{skill}}: {{count}}
             </span>
         </label>
+
         {% endfor %}
 
         <br>
         <button type='submit'>Next</button>
+
     </form>
+    {% endif %}
+    {% if not data %}
+    <h4>
+        Looks like no one is qualified to teach the skills these people want
+    </h4>
+    {% endif %}
 </div>
 {% endblock %}

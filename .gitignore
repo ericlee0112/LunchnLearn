@@ -6,6 +6,11 @@ __pycache__/
 # C extensions
 *.so
 
+#Api credentials
+lunchnlearn-b8be1031553e.json
+credentials.json
+apikey.txt
+
 # Distribution / packaging
 .Python
 env/
