@@ -13,7 +13,5 @@ urlpatterns = [
     path("choose_skill", views.choose_skill, name="choose_skill"),
     path("choose_lead", views.choose_lead, name="choose_lead"),
     path("choose_time", views.choose_time, name="choose_time"),
-    path("choose_food", views.choose_food, name="choose_food"),
-    path("confirm", views.confirm, name="confirm"),
     path("submit", views.submit, name="submit")
 ]
