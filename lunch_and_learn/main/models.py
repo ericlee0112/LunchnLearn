@@ -10,11 +10,11 @@ class User(models.Model):
 class Skill(models.Model):
     skill_name = models.CharField(max_length = 100, primary_key = True)
 
-class Food_Options(models.Model):
-    food_name = models.CharField(max_length = 100, primary_key = True)
+# class Food_Options(models.Model):
+#     food_name = models.CharField(max_length = 100, primary_key = True)
 
 class Event(models.Model):
-    location = models.CharField(max_length = 100)
+    #location = models.CharField(max_length = 100)
     start_date_time = models.DateTimeField(auto_now_add=False)
     end_date_time = models.DateTimeField(auto_now_add=False)
     skill = models.ForeignKey(Skill, on_delete= models.DO_NOTHING)
@@ -35,8 +35,8 @@ class Event_Attendees(models.Model):
     class Meta:
         unique_together = ('username', 'event_id')
 
-class Event_Food(models.Model):
-    foodname = models.ForeignKey(Food_Options, on_delete = models.CASCADE)
-    event_id = models.ForeignKey(Event, on_delete = models.CASCADE)
-    class Meta:
-        unique_together = ('foodname', 'event_id')
+# class Event_Food(models.Model):
+#     foodname = models.ForeignKey(Food_Options, on_delete = models.CASCADE)
+#     event_id = models.ForeignKey(Event, on_delete = models.CASCADE)
+#     class Meta:
+#         unique_together = ('foodname', 'event_id')
