@@ -6,13 +6,50 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import logout, authenticate, login
 from django.contrib import messages
 from .forms import NewUserForm
+from datetime import datetime
+import pytz
+from googleapiclient.discovery import build
+from google.oauth2 import service_account
 
+with open('main/apikey.txt') as f:
+    api_key = f.read().strip()
+
+credentials = service_account.Credentials.from_service_account_file('main/lunchnlearn-b8be1031553e.json')
+credentials = credentials.with_scopes(
+    ['https://www.googleapis.com/auth/calendar.events']
+)
+service = build(
+    'calendar', 'v3',
+    developerKey = api_key,
+    # http=http,
+    credentials=credentials,
+    discoveryServiceUrl = 'https://www.googleapis.com/discovery/v1/apis/{api}/{apiVersion}/rest'
+    )
+
+print('successful api build')
 
 
 def homepage(request):
-    #TODO: get dashboard (upcoming events)
+
+    user = request.COOKIES.get('signed_in')
+    auth = False
+    events = None
+    if user:
+        auth = True
+        user = User.objects.filter(username=user)[0]
+        #coming_events = Event.objects.filter(start_date_time__gt = datetime.now())
+        events = [i.event_id for i in user.event_attendees_set.all() if i.event_id.start_date_time > datetime.now(pytz.utc)]
+        events = [{
+            'start_date_time':str(e.start_date_time),
+            'end_date_time': str(e.end_date_time),
+            'skill': e.skill_id,
+            'teacher': f"{e.teacher.first_name} {e.teacher.last_name}",
+            'organizer': f"{e.organizer.first_name} {e.organizer.last_name}",
+            } for e in events]
+        print(events, user)
     return render(request=request,
-                  template_name='main/categories.html')
+                  template_name='main/categories.html',
+                  context={"data":events, "user":{"is_authenticated":auth}})
 
 def register(request):
     if request.method == "POST":
@@ -72,9 +109,54 @@ def create_event(request):
                   context={"data":people})
 
 def edit_profile(request):
-    return render(request=request,
-                  template_name="main/edit_profile.html")
+    all_skills = {i.pk for i in Skill.objects.all()}
+    user = request.COOKIES.get('signed_in')
+    user = User.objects.filter(username=user)[0]
+    known_skills = {i.skill_name_id : i.skill_level for i in user.user_skill_set.filter(skill_level__gt=0)}
+    wants_skills = {i.skill_name_id : i.skill_level for i in user.user_skill_set.filter(wants=True)}
+    
+    if request.method == "GET":
+        name = user.first_name + " " + user.last_name
+        return render(request=request,
+                    template_name="main/edit_profile.html",
+                    context={"new_skills_want": all_skills - set(wants_skills),
+                    "new_skills_know":all_skills-set(known_skills) ,
+                    "skills_want": wants_skills,
+                    "skills_know": known_skills,
+                    "name": name})
+    
+    if request.method == 'POST':
+        items = request.POST
+        # print(items)
+        new_skills = {}
+        for skill in all_skills:
+            wants = items.get(skill + "_want"), items.get(skill + "_want_val")
+            knows = items.get(skill + "_know"), items.get(skill + "_know_val")
+            # print(wants, knows)
+            if wants[0] and wants[1]:
+                new_skills[skill] = {"wants":True, "skill_level": max(int(wants[1]), int(knows[1]) if knows[1] else 0)}
+                continue
+            if knows[0] and knows[1] and int(knows[1][0]) > 0:
+                new_skills[skill] = {"wants": False, "skill_level": int(knows[1])}
+        
+        # print(new_skills)
+        for new_skill in new_skills:
+            if new_skill in known_skills or new_skill in wants_skills:
+                skill = user.user_skill_set.filter(skill_name_id =new_skill)[0]
+                skill.wants = new_skills[new_skill]["wants"]
+                skill.skill_level = new_skills[new_skill]["skill_level"]
+                skill.save()
+            else:
+                
+                skill = User_Skill(
+                    username=user, 
+                    skill_name=Skill.objects.filter(pk=new_skill)[0],
+                    wants=new_skills[new_skill]["wants"],
+                    skill_level=new_skills[new_skill]["skill_level"])
+                skill.save()
 
+
+        return redirect("main:edit_profile")
 def choose_skill(request):
     
     if request.method == 'POST':
@@ -132,37 +214,72 @@ def choose_lead(request):
                     context={"data":teachers})
         response.set_cookie('skill', skill)
         return response
-
-
-def choose_food(request):
-    #TODO
-    food = ['sandwiches', 'pasta', 'soup']
-    return render(request=request,
-                  template_name="main/choose_food.html",
-                  context={"data":food}) 
+ 
 
 def choose_time(request):
+    attendees = set(
+        map(
+            lambda s: s.strip(), 
+            request.COOKIES.get('attendees').strip('\"[]').replace("'", "").split(',')
+                ))
+    response = render(request=request,
+            template_name="main/select_time.html",
+            context={"emails":attendees})
+    if request.method == 'POST':
 
-    data = ['jaehyunlee98@gmail.com', 'anantkandadai@gmail.com'];
-    return render(request=request,
-                  template_name="main/select_time.html",
-                  context={"emails":data})
+        teacher = request.POST.get('teacher')
+        response.set_cookie('teacher',teacher)
+    return response
 
 
-def confirm(request):
-    #TODO
-    """Confirm all details including date, time, teacher, skill, attendees and food options
-    """
-    #response.delete_cookie(key)
-    pass
 
 def submit(request):
-    #TODO
     if request.method == 'POST':
         items = request.POST
-        skill,teacher,organizer,start_dt,end_dt = items.get('skill'),items.get('teacher'),items.get('organizer'),items.get('start_date_time'),items.get('end_date_time')
+        attendees = set(
+            map(
+                lambda s: s.strip(), 
+                request.COOKIES.get('attendees').strip('\"[]').replace("'", "").split(',')
+                    ))
+        teacher = User.objects.filter(pk=request.COOKIES.get('teacher'))[0]
+        skill = Skill.objects.filter(pk=request.COOKIES.get('skill'))[0]
+        organizer = User.objects.filter(pk=request.COOKIES.get('signed_in'))[0]
         
-        Event(skill=skill,teacher=teacher,organizer=organizer,start_dt=start_dt,end_dt=end_dt).save()
+        print(teacher, skill)
+        print(items)
+        
+        start_dt,end_dt = items.get('start_date_time'),items.get('end_date_time')
+
+
+        if start_dt > end_dt or not start_dt or not end_dt:
+            return redirect("main:choose_time")
+        print(start_dt, end_dt)
+        e = Event(skill=skill,teacher=teacher,organizer=organizer,start_date_time=start_dt,end_date_time=end_dt)#.save()
+        e.clean_fields()
+        print(e.__dict__)
+        e.save()
+        for a in attendees:
+            attendee = User.objects.filter(username=a)[0]
+            Event_Attendees(username=attendee, event_id=e).save()
+        
+        google_calendar_event = {
+            'summary': f'lunch and learn about {skill.skill_name}',
+            'start': {"dateTime": start_dt+":00Z"},
+            'end': {"dateTime": end_dt+":00Z"},
+            'description': f'Come out and learn all about {skill.skill_name}!! Lead by {teacher.first_name} {teacher.last_name}',
+            'organizer': {
+                "email": organizer.username,
+                "displayName": f"{organizer.first_name} {organizer.last_name}"
+            },
+            "attendees": [
+                {"email": attendee}
+                for attendee in attendees
+            ]
+        }
+
+        event = service.events().insert(calendarId='primary', body=google_calendar_event).execute()
+        print("Event: ", event.get('htmlLink'), 'more:\n', event)
+
 
     """Submit all information to database and redirect to home page
     """
