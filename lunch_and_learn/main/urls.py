@@ -5,9 +5,6 @@ app_name = 'main'
 
 urlpatterns = [
     path("", views.homepage, name="homepage"),
-    path("register/", views.register, name="register"),
-    path("logout", views.logout_request, name="logout"),
-    path("login", views.login_request, name="login"),
     path("create_event", views.create_event, name="create_event"),
     path("edit_profile", views.edit_profile, name="edit_profile"),
     path("choose_skill", views.choose_skill, name="choose_skill"),
