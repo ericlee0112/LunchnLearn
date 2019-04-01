@@ -15,7 +15,7 @@ sh launch_db.sh
 After you run the command above, you should see in your terminal that the database system is ready to accept connections. 
 
 Assuming that no errors were encountered from running launch_db.sh, you can then create a virtual environment, this is where you will install your dependencies in.
-To do this, you run:
+To do this, first, create a new tab in your terminal separate from the tab running the launch_db.sh script and run:
 ```
 virtualenv name_of_your_virtual_environment
 ```
