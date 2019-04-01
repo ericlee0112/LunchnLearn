@@ -17,6 +17,9 @@
             </span>
         </label>
         {% endfor %}
+        {% if not data %}
+        <h4> Please select a skill </h4>
+        {% endif %}
         <br>
 
         <button type='submit'>Next</button>
