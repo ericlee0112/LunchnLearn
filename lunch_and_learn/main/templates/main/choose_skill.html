@@ -14,14 +14,15 @@
         <label>
             <input type="radio" name='skill' value="{{skill}}">
             <span>
-                {{skill}}: {{count}}
+                <b>{{skill}}</b>: {{count}} attendees are interested
             </span>
         </label>
+        <br>
 
         {% endfor %}
 
         <br>
-        <button type='submit'>Next</button>
+        <button class="waves-effect waves-light btn" type='submit'>Next</button>
 
     </form>
     {% endif %}

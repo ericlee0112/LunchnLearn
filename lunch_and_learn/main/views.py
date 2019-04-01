@@ -52,11 +52,11 @@ def homepage(request):
         user = user[0]
         events = [i.event_id for i in user.event_attendees_set.all() if i.event_id.start_date_time > datetime.now(pytz.utc)]
         events = [{
-            'start_date_time':str(e.start_date_time),
-            'end_date_time': str(e.end_date_time),
-            'skill': e.skill_id,
-            'teacher': f"{e.teacher.first_name} {e.teacher.last_name}",
-            'organizer': f"{e.organizer.first_name} {e.organizer.last_name}",
+            'Start Date Time':e.start_date_time.replace(tzinfo=pytz.utc).astimezone(pytz.timezone("America/Toronto")).strftime("%Y-%m-%d %I:%M %p"),
+            'End Date Time': e.end_date_time.replace(tzinfo=pytz.utc).astimezone(pytz.timezone("America/Toronto")).strftime("%Y-%m-%d %I:%M %p"),
+            'Skill': e.skill_id,
+            'Teacher': f"{e.teacher.first_name} {e.teacher.last_name}",
+            'Organizer': f"{e.organizer.first_name} {e.organizer.last_name}",
             } for e in events]
         print(events, user)
     return render(request=request,
@@ -266,14 +266,16 @@ def submit(request):
         
         print(teacher, skill)
         print(items)
-        time_offset = ":00-04:00"
+        time_offset = ":00-0400"
         start_dt,end_dt = items.get('start_date_time') + time_offset,items.get('end_date_time') + time_offset
 
 
         if start_dt > end_dt or not start_dt or not end_dt:
             return redirect("main:choose_time")
         print(start_dt, end_dt)
-        e = Event(skill=skill,teacher=teacher,organizer=organizer,start_date_time=start_dt,end_date_time=end_dt)
+        e = Event(skill=skill,teacher=teacher,organizer=organizer,
+        start_date_time=datetime.strptime(start_dt, "%Y-%m-%dT%H:%M:%S%z"),
+        end_date_time=datetime.strptime(end_dt, "%Y-%m-%dT%H:%M:%S%z"))
         e.clean_fields()
         print(e.__dict__)
         e.save()

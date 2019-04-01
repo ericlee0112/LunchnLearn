@@ -13,16 +13,17 @@
             <input type="radio" name="teacher" value="{{teacher}}">
             <span>
                 <!-- info = [user full name, skill level] -->
-                {{info.0}}: {{info.1}}
+                <b>{{info.0}}</b>: {{info.1}}/10 proficiency
             </span>
         </label>
+        <br>
         {% endfor %}
         {% if not data %}
         <h4> Please select a skill </h4>
         {% endif %}
         <br>
 
-        <button type='submit'>Next</button>
+        <button class="waves-effect waves-light btn" type='submit'>Next</button>
     </form>
 </div>
 {% endblock %}
