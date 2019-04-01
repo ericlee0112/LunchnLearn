@@ -23,7 +23,7 @@ Virtualenv should already be pre-installed if you are using Python version 3.0 o
 ```
 python3 -m pip install --user virtualenv
 ```
-Now that your have a virtual environment set up, now it's time to boot up your virtual environment.
+Now that you have a virtual environment set up, now it's time to boot up your virtual environment.
 ```
 source name_of_your_virtual_environment/bin/activate
 ```
