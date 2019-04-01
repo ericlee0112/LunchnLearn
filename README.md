@@ -13,12 +13,3 @@ https://docs.docker.com/install/
 bash launch_server.sh
 ```
 After you run the command above, you should see in your terminal that the server is ready to accept requests. 
-
-This will load fake data into the Postgres database
-
-Finally, you can boot up the application by running:
-```
-python manage.py runserver
-```
-It is suggested that you use Google Chrome to view this application
-Go on to localhost:8000 to view the lunch and learn application
