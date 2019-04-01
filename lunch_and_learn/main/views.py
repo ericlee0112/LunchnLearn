@@ -266,14 +266,14 @@ def submit(request):
         
         print(teacher, skill)
         print(items)
-        
-        start_dt,end_dt = items.get('start_date_time'),items.get('end_date_time')
+        time_offset = ":00-04:00"
+        start_dt,end_dt = items.get('start_date_time') + time_offset,items.get('end_date_time') + time_offset
 
 
         if start_dt > end_dt or not start_dt or not end_dt:
             return redirect("main:choose_time")
         print(start_dt, end_dt)
-        e = Event(skill=skill,teacher=teacher,organizer=organizer,start_date_time=start_dt,end_date_time=end_dt)#.save()
+        e = Event(skill=skill,teacher=teacher,organizer=organizer,start_date_time=start_dt,end_date_time=end_dt)
         e.clean_fields()
         print(e.__dict__)
         e.save()
@@ -283,8 +283,8 @@ def submit(request):
         
         google_calendar_event = {
             'summary': f'lunch and learn about {skill.skill_name}',
-            'start': {"dateTime": start_dt+":00Z"},
-            'end': {"dateTime": end_dt+":00Z"},
+            'start': {"dateTime": start_dt, "timeZone" : "America/Toronto"},
+            'end': {"dateTime": end_dt, "timeZone" : "America/Toronto"},
             'description': f'Come out and learn all about {skill.skill_name}!! Lead by {teacher.first_name} {teacher.last_name}',
             'organizer': {
                 "email": organizer.username,
@@ -296,7 +296,7 @@ def submit(request):
             ]
         }
 
-        event = service.events().insert(calendarId='primary', body=google_calendar_event).execute()
+        event = service.events().insert(calendarId='primary',sendNotifications=True, body=google_calendar_event).execute()
         print("Event: ", event.get('htmlLink'), 'more:\n', event)
 
 
