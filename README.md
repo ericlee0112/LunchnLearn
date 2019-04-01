@@ -14,5 +14,7 @@ bash launch_server.sh
 ```
 After you run the command above, you should see in your terminal that the server is ready to accept requests. 
 
+Navigate to 'localhost:8000' to view access the web application.
+
 # Notes
 - the server should be running on 'localhost:8000/' and not 'http://127.0.0.1:8000/'
