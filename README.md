@@ -1,8 +1,8 @@
-#Before you start
+# Before you start
 1. Make sure you have python version 3.0 or higher
 2. Make sure you have pip version 19 or higher
 3. Install Docker
-#How to set up environment
+# How to set up environment
 clone the repository
 ```
 git clone https://github.com/asabedia/LunchnLearn.git
