@@ -65,6 +65,7 @@
 </head>
 
 <body data-js-vars=”{{data}}”>
+	{% if completeness %}
 	<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	
@@ -463,7 +464,10 @@
 		onreadystatechange="if (this.readyState === 'complete') this.onload()">
 		</script>
 
-
+	{% endif %}
+	{% if not completeness %}
+	<h5> please select a leader </h5>
+	{% endif %}
 </body>
 
 </html>

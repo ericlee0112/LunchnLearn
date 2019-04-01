@@ -121,8 +121,8 @@ def edit_profile(request):
                     skill_level=new_skills[new_skill]["skill_level"])
                 skill.save()
 
-
         return redirect("main:edit_profile")
+
 def choose_skill(request):
     
     if request.method == 'POST':
@@ -145,14 +145,16 @@ def choose_skill(request):
                     new_skills.append(skill)
 
             print('teachable skills: ', [i.skill_name_id for i in new_skills])
-        skills = {user_skill.skill_name_id: user_skill.skill_name.user_skill_set.count() for user_skill in new_skills}
+            skills = {user_skill.skill_name_id: user_skill.skill_name.user_skill_set.count() for user_skill in new_skills}
         
         
-        response = render(request=request,
-                    template_name="main/choose_skill.html",
-                    context={"data":skills})
-        response.set_cookie('attendees', attendees)
-        return response
+            response = render(request=request,
+                        template_name="main/choose_skill.html",
+                        context={"data":skills})
+            response.set_cookie('attendees', attendees)
+            return response
+        else:
+            return redirect("main:create_event")
 
 def choose_lead(request):
 
@@ -188,14 +190,19 @@ def choose_time(request):
             lambda s: s.strip(), 
             request.COOKIES.get('attendees').strip('\"[]').replace("'", "").split(',')
                 ))
-    response = render(request=request,
-            template_name="main/select_time.html",
-            context={"emails":attendees})
+    
     if request.method == 'POST':
 
         teacher = request.POST.get('teacher')
+        response = render(request=request,
+            template_name="main/select_time.html",
+            context={"emails":attendees, "completeness": True})
         response.set_cookie('teacher',teacher)
-    return response
+        if not teacher:
+            response = render(request=request,
+                template_name="main/select_time.html",
+                context={"emails":attendees, "completeness": False})
+        return response
 
 
 
@@ -213,14 +220,14 @@ def submit(request):
         
         print(teacher, skill)
         print(items)
-        
-        start_dt,end_dt = items.get('start_date_time'),items.get('end_date_time')
+        time_offset = ":00-04:00"
+        start_dt,end_dt = items.get('start_date_time') + time_offset,items.get('end_date_time') + time_offset
 
 
         if start_dt > end_dt or not start_dt or not end_dt:
             return redirect("main:choose_time")
         print(start_dt, end_dt)
-        e = Event(skill=skill,teacher=teacher,organizer=organizer,start_date_time=start_dt,end_date_time=end_dt)#.save()
+        e = Event(skill=skill,teacher=teacher,organizer=organizer,start_date_time=start_dt,end_date_time=end_dt)
         e.clean_fields()
         print(e.__dict__)
         e.save()
@@ -230,8 +237,8 @@ def submit(request):
         
         google_calendar_event = {
             'summary': f'lunch and learn about {skill.skill_name}',
-            'start': {"dateTime": start_dt+":00Z"},
-            'end': {"dateTime": end_dt+":00Z"},
+            'start': {"dateTime": start_dt, "timeZone" : "America/Toronto"},
+            'end': {"dateTime": end_dt, "timeZone" : "America/Toronto"},
             'description': f'Come out and learn all about {skill.skill_name}!! Lead by {teacher.first_name} {teacher.last_name}',
             'organizer': {
                 "email": organizer.username,
@@ -243,7 +250,7 @@ def submit(request):
             ]
         }
 
-        event = service.events().insert(calendarId='primary', body=google_calendar_event).execute()
+        event = service.events().insert(calendarId='primary',sendNotifications=True, body=google_calendar_event).execute()
         print("Event: ", event.get('htmlLink'), 'more:\n', event)
 
 
