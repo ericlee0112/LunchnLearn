@@ -14,6 +14,7 @@
 	.chart {
 		font-family: Arial, sans-serif;
 		font-size: 12px;
+
 	}
 
 	.axis path,
@@ -65,6 +66,7 @@
 </head>
 
 <body data-js-vars=”{{data}}”>
+	{% if completeness %}
 	<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	
@@ -263,26 +265,29 @@
 		};
 	</script>
 	<script src="https://apis.google.com/js/client.js?onload=handleClientLoad" type="text/javascript"></script>
-	
+	<h3>Check Invitee Availabilities</h3>
+	<form id="check_avail">
+			<label for="start_time_window">Calendar Window Start:</label>
+			<input id="start_time_window" type="date" name="position" value="">
+			<label for="end_time_window">Calendar Window End:</label>
+			<input id="end_time_window" type="date" name="position" value="">
+			<button class="waves-effect waves-light btn" type='button' onclick="listUpcomingEvents()">Refresh calendar</button>
+	</form>
+
+	<h3>Create Event!</h3>
 	<form action='submit' method='POST'>
 		{% csrf_token %}
 		<label for="start_date_time">Start Time:</label>
 		<input id="start_date_time" type="datetime-local" name="start_date_time" value="">
 		<label for="end_date_time">End Time:</label>
-		<input id="end_date_time" type="datetime-local" name="end_date_time" value="">
-		<button type='submit'>Create Event</button>
+		<input  id="end_date_time" type="datetime-local" name="end_date_time" value="">
+		<button class="waves-effect waves-light btn" type='submit'>Create Event</button>
 	</form>
 
-	<form>
-		<label for="start_time_window">Calendar Window Start:</label>
-		<input id="start_time_window" type="date" name="position" value="">
-		<label for="end_time_window">Calendar Window End:</label>
-		<input id="end_time_window" type="date" name="position" value="">
-		<button type='button' onclick="listUpcomingEvents()">Refresh calendar</button>
-	</form>
+	
 	<h3>Invitee Availabilities</h3>
-	<button id="authorize_button" style="display: none;">Authorize</button>
-	<button id="signout_button" style="display: none;">Sign Out</button>
+	<button class="waves-effect waves-light btn" id="authorize_button" style="display: none;">Authorize</button>
+	<button class="waves-effect waves-light btn" id="signout_button" style="display: none;">Sign Out</button>
 	<pre id="content" style="white-space: pre-wrap;"></pre>
 
 	<div id="chart"></div>
@@ -463,7 +468,10 @@
 		onreadystatechange="if (this.readyState === 'complete') this.onload()">
 		</script>
 
-
+	{% endif %}
+	{% if not completeness %}
+	<h5> please select a leader </h5>
+	{% endif %}
 </body>
 
 </html>

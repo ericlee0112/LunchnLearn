@@ -17,7 +17,7 @@
             {{skill}}
         </span>
         
-        <input type="number" id="skill" name="{{skill}}_want_val" min="-1" max="10"value="{{level}}">
+        <input type="range" name="{{skill}}_want_val" min="-1" max="10"value="{{level}}">
         <label>skill level</label><br>
     </label>
     {% endfor %}
@@ -27,7 +27,7 @@
         <span>
             {{skill}}
         </span>
-        <input type="number" name="{{skill}}_want_val" min="-1" max="10" value="0">
+        <input type="range" name="{{skill}}_want_val" min="-1" max="10" value="0">
         <label>skill level</label><br>
     </label>
     {% endfor %}
@@ -38,7 +38,7 @@
         <span>
             {{skill}}
         </span>
-        <input type="number" name="{{skill}}_know_val" min="0" max="10" value="{{level}}">
+        <input type="range" name="{{skill}}_know_val" min="0" max="10" value="{{level}}">
         <label>skill level</label><br>
     </label>
     {% endfor %}
@@ -48,11 +48,11 @@
         <span>
             {{skill}}
         </span>
-        <input type="number" name="{{skill}}_know_val" min="1" max="10" value="1">
+        <input type="range" name="{{skill}}_know_val" min="1" max="10" value="1">
         <label>skill level</label><br>
     </label>
     {% endfor %}
-    <input type="submit" value="OK">
+    <button class="waves-effect waves-light btn" type="submit">OK</button>
 </form>
 
 {% endblock %}
